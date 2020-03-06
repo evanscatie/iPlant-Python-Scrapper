@@ -35,6 +35,8 @@ for i in range (1, 1794):
     soup = BeautifulSoup(page.text, 'html.parser')
 
     tables = soup.find_all('table', class_='pdetail')
+
+    # iterates through all tables in html
     for table in tables:
         rows = table.find_all("tr")
 
@@ -61,6 +63,7 @@ for i in range (1, 1794):
             except IndexError:
                 print('IndexError - Skipping Record')
 
+    # finds imgs in html and stores to list
     imgs = soup.find_all('img', class_='image_alignment')
     imgs_list = []
     for img in imgs:
@@ -69,22 +72,15 @@ for i in range (1, 1794):
     result['images_list'] = imgs_list
     master_result[i] = result
 
+    # remove this statement if you would like to run for all 1794 plants
     if i > 3:
         break
 
     time.sleep(.25)
 
+# creates json object 
 filename = f'outputs/plant_info.json'
 
-if not os.path.exists(os.path.dirname(filename)):
-    try:
-        os.makedirs(os.path.dirname(filename))
-    except OSError as exc: # Guard against race condition
-        if exc.errno != errno.EEXIST:
-            raise
-
-with open(filename, 'w') as outfile:
-    json.dump(master_result, outfile, indent=4)
 
 filename = f'outputs/plant_seeds.sql'
 if not os.path.exists(os.path.dirname(filename)):
@@ -94,7 +90,7 @@ if not os.path.exists(os.path.dirname(filename)):
         if exc.errno != errno.EEXIST:
             raise
 
-
+# creates syntax for sql seed data insert statements
 with open(filename, 'w') as outfile:
     for value in range(1,5):
         seed = master_result[value]
